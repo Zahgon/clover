@@ -1,8 +1,6 @@
 package badger
 
 import (
-	"errors"
-	"log"
 	"sync"
 	"time"
 
@@ -17,104 +15,56 @@ type badgerStore struct {
 }
 
 func (store *badgerStore) Begin(update bool) (store.Tx, error) {
-	tx := store.db.NewTransaction(update)
-	return &badgerTx{Txn: tx}, nil
+	_ = "STUB: not implemented"
+	return *new(store.Tx), nil
 }
 
-func (store *badgerStore) Close() error {
-	store.stopGC()
-	return store.db.Close()
-}
+func (store *badgerStore) Close() error { _ = "STUB: not implemented"; return nil }
 
 type badgerTx struct {
 	*badger.Txn
 }
 
-func (tx *badgerTx) Set(key, value []byte) error {
-	return tx.Txn.Set(key, value)
-}
+func (tx *badgerTx) Set(key, value []byte) error { _ = "STUB: not implemented"; return nil }
 
-func getItemValue(item *badger.Item) ([]byte, error) {
-	var value []byte
-	err := item.Value(func(val []byte) error {
-		value = val
-		return nil
-	})
-	return value, err
-}
+func getItemValue(item *badger.Item) ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
-func (tx *badgerTx) Get(key []byte) ([]byte, error) {
-	item, err := tx.Txn.Get(key)
-	if errors.Is(err, badger.ErrKeyNotFound) {
-		return nil, nil
-	}
+func (tx *badgerTx) Get(key []byte) ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
-	if err != nil {
-		return nil, err
-	}
-	return getItemValue(item)
-}
+func (tx *badgerTx) Commit() error { _ = "STUB: not implemented"; return nil }
 
-func (tx *badgerTx) Commit() error {
-	return tx.Txn.Commit()
-}
-
-func (tx *badgerTx) Rollback() error {
-	tx.Txn.Discard()
-	return nil
-}
+func (tx *badgerTx) Rollback() error { _ = "STUB: not implemented"; return nil }
 
 func (tx *badgerTx) Cursor(forward bool) (store.Cursor, error) {
-	opts := badger.DefaultIteratorOptions
-	opts.Reverse = !forward
-	return &badgerCursor{it: tx.NewIterator(opts)}, nil
+	_ = "STUB: not implemented"
+	return *new(store.Cursor), nil
 }
 
 type badgerCursor struct {
 	it *badger.Iterator
 }
 
-func (cursor *badgerCursor) Seek(key []byte) error {
-	cursor.it.Seek(key)
-	return nil
-}
+func (cursor *badgerCursor) Seek(key []byte) error { _ = "STUB: not implemented"; return nil }
 
-func (cursor *badgerCursor) Next() {
-	cursor.it.Next()
-}
+func (cursor *badgerCursor) Next() { _ = "STUB: not implemented"; return }
 
-func (cursor *badgerCursor) Valid() bool {
-	return cursor.it.Valid()
-}
+func (cursor *badgerCursor) Valid() bool { _ = "STUB: not implemented"; return false }
 
 func (cursor *badgerCursor) Item() (store.Item, error) {
-	item := cursor.it.Item()
-
-	value, err := getItemValue(item)
-	return store.Item{Key: item.Key(), Value: value}, err
+	_ = "STUB: not implemented"
+	return *new(store.Item), nil
 }
 
-func (cursor *badgerCursor) Close() error {
-	cursor.it.Close()
-	return nil
-}
+func (cursor *badgerCursor) Close() error { _ = "STUB: not implemented"; return nil }
 
 func Open(dir string) (store.Store, error) {
-	return OpenWithOptions(badger.DefaultOptions(dir))
+	_ = "STUB: not implemented"
+	return *new(store.Store), nil
 }
 
 func OpenWithOptions(opts badger.Options) (store.Store, error) {
-	db, err := badger.Open(opts)
-	if err != nil {
-		return nil, err
-	}
-
-	dataStore := &badgerStore{
-		db:     db,
-		chQuit: make(chan struct{}, 1),
-	}
-	dataStore.startGC()
-	return dataStore, nil
+	_ = "STUB: not implemented"
+	return *new(store.Store), nil
 }
 
 const (
@@ -122,32 +72,6 @@ const (
 	GCDiscardRatio    = 0.5
 )
 
-func (store *badgerStore) startGC() {
-	store.chWg.Add(1)
+func (store *badgerStore) startGC() { _ = "STUB: not implemented"; return }
 
-	go func() {
-		defer store.chWg.Done()
-
-		ticker := time.NewTicker(GCReclaimInterval)
-		defer ticker.Stop()
-
-		for {
-			select {
-			case <-store.chQuit:
-				return
-
-			case <-ticker.C:
-				err := store.db.RunValueLogGC(GCDiscardRatio)
-				if err != nil && errors.Is(err, badger.ErrNoRewrite) {
-					log.Printf("RunValueLogGC(): %s\n", err.Error())
-				}
-			}
-		}
-	}()
-}
-
-func (store *badgerStore) stopGC() {
-	store.chQuit <- struct{}{}
-	store.chWg.Wait()
-	close(store.chQuit)
-}
+func (store *badgerStore) stopGC() { _ = "STUB: not implemented"; return }

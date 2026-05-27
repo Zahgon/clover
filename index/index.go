@@ -31,26 +31,15 @@ type indexBase struct {
 	collection, field string
 }
 
-func (idx *indexBase) Collection() string {
-	return idx.collection
-}
+func (idx *indexBase) Collection() string { _ = "STUB: not implemented"; return "" }
 
-func (idx *indexBase) Field() string {
-	return idx.field
-}
+func (idx *indexBase) Field() string { _ = "STUB: not implemented"; return "" }
 
 type Query interface {
 	Run(onValue func(docId string) error) error
 }
 
 func CreateIndex(collection, field string, idxType Type, tx store.Tx) Index {
-	indexBase := indexBase{collection: collection, field: field}
-	switch idxType {
-	case SingleField:
-		return &rangeIndex{
-			indexBase: indexBase,
-			tx:        tx,
-		}
-	}
-	return nil
+	_ = "STUB: not implemented"
+	return *new(Index)
 }

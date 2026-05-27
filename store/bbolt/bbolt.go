@@ -1,12 +1,7 @@
 package bbolt
 
 import (
-	"bytes"
-	"os"
-	"path/filepath"
-
 	"github.com/ostafen/clover/v2/store"
-	"github.com/ostafen/clover/v2/util"
 	"go.etcd.io/bbolt"
 )
 
@@ -20,91 +15,44 @@ const (
 )
 
 func Open(dir string) (store.Store, error) {
-	return OpenWithOptions(dir, nil)
+	_ = "STUB: not implemented"
+	return *new(store.Store), nil
 }
 
 func OpenWithOptions(dir string, opts *bbolt.Options) (store.Store, error) {
-	dirExists, err := util.PathExists(dir)
-	if err != nil {
-		return nil, err
-	}
-	if !dirExists {
-		err = os.MkdirAll(dir, 0700)
-		if err != nil {
-			return nil, err
-		}
-	}
-	db, err := bbolt.Open(filepath.Join(dir, dbFileName), 0600, opts)
-	if err != nil {
-		return nil, err
-	}
-	dataStore := &boltStore{db: db}
-	err = dataStore.createRootBucketIfNotExists()
-	return dataStore, err
+	_ = "STUB: not implemented"
+	return *new(store.Store), nil
 }
 
-func (store *boltStore) createRootBucketIfNotExists() error {
-	tx, err := store.db.Begin(true)
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-
-	_, err = tx.CreateBucketIfNotExists([]byte(rootBucket))
-	if err != nil {
-		return err
-	}
-	return tx.Commit()
-}
+func (store *boltStore) createRootBucketIfNotExists() error { _ = "STUB: not implemented"; return nil }
 
 func (store *boltStore) Begin(update bool) (store.Tx, error) {
-	tx, err := store.db.Begin(update)
-	return &boltTx{Tx: tx}, err
+	_ = "STUB: not implemented"
+	return *new(store.Tx), nil
 }
 
-func (store *boltStore) Close() error {
-	return store.db.Close()
-}
+func (store *boltStore) Close() error { _ = "STUB: not implemented"; return nil }
 
 type boltTx struct {
 	*bbolt.Tx
 }
 
-func (tx *boltTx) bucket() *bbolt.Bucket {
-	return tx.Bucket([]byte(rootBucket))
-}
+func (tx *boltTx) bucket() *bbolt.Bucket { _ = "STUB: not implemented"; return nil }
 
-func (tx *boltTx) Set(key, value []byte) error {
-	bucket := tx.bucket()
-	return bucket.Put(key, value)
-}
+func (tx *boltTx) Set(key, value []byte) error { _ = "STUB: not implemented"; return nil }
 
-func (tx *boltTx) Get(key []byte) ([]byte, error) {
-	bucket := tx.bucket()
-	return bucket.Get(key), nil
-}
+func (tx *boltTx) Get(key []byte) ([]byte, error) { _ = "STUB: not implemented"; return nil, nil }
 
-func (tx *boltTx) Delete(key []byte) error {
-	bucket := tx.bucket()
-	return bucket.Delete(key)
-}
+func (tx *boltTx) Delete(key []byte) error { _ = "STUB: not implemented"; return nil }
 
 func (tx *boltTx) Cursor(forward bool) (store.Cursor, error) {
-	bucket := tx.bucket()
-	cursor := bucket.Cursor()
-	return &boltCursor{
-		Cursor:  cursor,
-		forward: forward,
-	}, nil
+	_ = "STUB: not implemented"
+	return *new(store.Cursor), nil
 }
 
-func (tx *boltTx) Commit() error {
-	return tx.Tx.Commit()
-}
+func (tx *boltTx) Commit() error { _ = "STUB: not implemented"; return nil }
 
-func (tx *boltTx) Rollback() error {
-	return tx.Tx.Rollback()
-}
+func (tx *boltTx) Rollback() error { _ = "STUB: not implemented"; return nil }
 
 type boltCursor struct {
 	*bbolt.Cursor
@@ -113,52 +61,17 @@ type boltCursor struct {
 	currItem *store.Item
 }
 
-func (c *boltCursor) Seek(seek []byte) error {
-	key, value := c.Cursor.Seek(seek)
-	if key != nil && value != nil {
-		c.currItem = &store.Item{
-			Key:   key,
-			Value: value,
-		}
-	}
+func (c *boltCursor) Seek(seek []byte) error { _ = "STUB: not implemented"; return nil }
 
-	c.adjustSeek(key, seek)
-	return nil
-}
+func (c *boltCursor) adjustSeek(key []byte, seek []byte) { _ = "STUB: not implemented"; return }
 
-func (c *boltCursor) adjustSeek(key []byte, seek []byte) {
-	if key != nil && !bytes.Equal(key, seek) && !c.forward {
-		key, value := c.Cursor.Prev()
-		c.currItem = &store.Item{
-			Key:   key,
-			Value: value,
-		}
-	}
-}
+func (c *boltCursor) Next() { _ = "STUB: not implemented"; return }
 
-func (c *boltCursor) Next() {
-	var key, value []byte
-	if c.forward {
-		key, value = c.Cursor.Next()
-	} else {
-		key, value = c.Cursor.Prev()
-	}
-
-	c.currItem = &store.Item{
-		Key:   key,
-		Value: value,
-	}
-}
-
-func (c *boltCursor) Valid() bool {
-	return c.currItem != nil && c.currItem.Key != nil && c.currItem.Value != nil
-}
+func (c *boltCursor) Valid() bool { _ = "STUB: not implemented"; return false }
 
 func (c *boltCursor) Item() (store.Item, error) {
-	item := c.currItem
-	return *item, nil
+	_ = "STUB: not implemented"
+	return *new(store.Item), nil
 }
 
-func (c *boltCursor) Close() error {
-	return nil
-}
+func (c *boltCursor) Close() error { _ = "STUB: not implemented"; return nil }
